@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.mapper;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.entity.Note;
 import org.springframework.stereotype.Component;
 
@@ -14,11 +15,7 @@ public class NoteMapper {
         return note;
     }
 
-    public NoteDTO toDto(Note note) {
-        NoteDTO dto = new NoteDTO();
-        dto.setTitle(note.getTitle());
-        dto.setText(note.getText());
-        dto.setTags(note.getTags());
-        return dto;
+    public NoteSummaryDTO toDto(Note note) {
+        return new NoteSummaryDTO(note.getTitle(), note.getCreatedDate());
     }
 }

@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.service.impl;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.dto.error.ErrorCode;
 import com.marhaba.notes_app.dto.exception.BusinessException;
 import com.marhaba.notes_app.entity.Note;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +37,7 @@ public class NoteServiceImpl implements NoteService {
     }
 
     public Note updateNote(String id, NoteDTO updatedNoteDTO) {
-        Note note = getNoteById(id);
+        Note note = getNoteDetailsById(id);
         note.setTitle(updatedNoteDTO.getTitle());
         note.setText(updatedNoteDTO.getText());
         note.setTags(updatedNoteDTO.getTags());
@@ -45,11 +45,24 @@ public class NoteServiceImpl implements NoteService {
     }
 
     public void deleteNoteById(String id) {
-        getNoteById(id);
+        getNoteDetailsById(id);
         noteRepository.deleteById(id);
     }
 
-    public Note getNoteById(String id) {
+    public Page<NoteSummaryDTO> listNoteSummaries(Set<Tag> tags, Pageable pageable) {
+        Page<Note> notesPage;
+
+        if (tags == null || tags.isEmpty()) {
+            notesPage = noteRepository.findAllByOrderByCreatedDateDesc(pageable);
+        } else {
+            notesPage = noteRepository.findByTagsInOrderByCreatedDateDesc(tags, pageable);
+        }
+
+        return notesPage.map(noteMapper::toDto);
+
+    }
+
+    public Note getNoteDetailsById(String id) {
         return noteRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("Note with id {} not found in the system", id);
@@ -57,15 +70,8 @@ public class NoteServiceImpl implements NoteService {
                 });
     }
 
-    public Page<Note> listNotes(Set<Tag> tags, Pageable pageable) {
-        if (CollectionUtils.isEmpty(tags)) {
-            return noteRepository.findAllByOrderByCreatedDateDesc(pageable);
-        }
-        return noteRepository.findByTagsInOrderByCreatedDateDesc(tags, pageable);
-    }
-
     public Map<String, Integer> getWordStats(String noteId) {
-        Note note = getNoteById(noteId);
+        Note note = getNoteDetailsById(noteId);
         return Stream.of(note.getText().toLowerCase().split("\\W+"))
                 .map(String::toLowerCase)
                 .collect(Collectors.toMap(

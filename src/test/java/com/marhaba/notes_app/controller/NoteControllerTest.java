@@ -2,6 +2,7 @@ package com.marhaba.notes_app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.entity.Note;
 import com.marhaba.notes_app.entity.Tag;
 import com.marhaba.notes_app.service.NoteService;
@@ -17,6 +18,7 @@ import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +47,7 @@ public class NoteControllerTest {
 
     private Note note;
     private NoteDTO noteDTO;
+    private NoteSummaryDTO noteSummaryDTO;
 
     @BeforeEach
     void setUp() {
@@ -58,6 +61,8 @@ public class NoteControllerTest {
         noteDTO.setTitle("Test Note");
         noteDTO.setText("This is a test note.");
         noteDTO.setTags(Set.of(Tag.IMPORTANT));
+
+        noteSummaryDTO = new NoteSummaryDTO("Test Note", LocalDateTime.now());
     }
 
     @Test
@@ -92,20 +97,19 @@ public class NoteControllerTest {
 
     @Test
     void testListNotes() throws Exception {
-        when(noteService.listNotes(anySet(), any())).thenReturn(new PageImpl<>(Collections.singletonList(note)));
+        when(noteService.listNoteSummaries(anySet(), any())).thenReturn(new PageImpl<>(Collections.singletonList(noteSummaryDTO)));
 
         mockMvc.perform(get("/api/v1/notes")
                         .param("page", "0")
                         .param("tags", "BUSINESS")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value(note.getId()))
                 .andExpect(jsonPath("$.content[0].title").value(note.getTitle()));
     }
 
     @Test
     void testGetNoteById() throws Exception {
-        when(noteService.getNoteById("123")).thenReturn(note);
+        when(noteService.getNoteDetailsById("123")).thenReturn(note);
 
         mockMvc.perform(get("/api/v1/notes/123"))
                 .andExpect(status().isOk())

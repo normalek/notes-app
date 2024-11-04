@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.controller;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.entity.Note;
 import com.marhaba.notes_app.entity.Tag;
 import com.marhaba.notes_app.service.NoteService;
@@ -58,18 +59,18 @@ public class NoteController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Note>> listNotes(
+    public ResponseEntity<Page<NoteSummaryDTO>> listNotes(
             @RequestParam(required = false) Set<Tag> tags,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Note> notes = noteService.listNotes(tags, pageable);
+        Page<NoteSummaryDTO> notes = noteService.listNoteSummaries(tags, pageable);
         return ResponseEntity.ok(notes);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Note> getNoteById(@PathVariable String id) {
-        Note note = noteService.getNoteById(id);
+        Note note = noteService.getNoteDetailsById(id);
         return ResponseEntity.ok(note);
     }
 

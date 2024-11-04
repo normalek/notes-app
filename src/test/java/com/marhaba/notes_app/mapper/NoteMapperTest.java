@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.mapper;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.entity.Note;
 import com.marhaba.notes_app.entity.Tag;
 import org.junit.jupiter.api.Test;
@@ -36,12 +37,10 @@ public class NoteMapperTest {
         note.setText("This is a test note.");
         note.setTags(Set.of(Tag.IMPORTANT));
 
-        NoteDTO noteDTO = noteMapper.toDto(note);
+        NoteSummaryDTO noteSummaryDTO = noteMapper.toDto(note);
 
-        assertNotNull(noteDTO);
-        assertEquals("Test Note", noteDTO.getTitle());
-        assertEquals("This is a test note.", noteDTO.getText());
-        assertEquals(1, noteDTO.getTags().size());
-        assertTrue(noteDTO.getTags().contains(Tag.IMPORTANT));
+        assertNotNull(noteSummaryDTO);
+        assertEquals("Test Note", noteSummaryDTO.getTitle());
+        assertNotNull(noteSummaryDTO.getCreatedDate());
     }
 }

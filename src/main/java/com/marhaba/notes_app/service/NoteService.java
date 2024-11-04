@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.service;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.entity.Note;
 import com.marhaba.notes_app.entity.Tag;
 import org.springframework.data.domain.Page;
@@ -16,9 +17,9 @@ public interface NoteService {
 
     void deleteNoteById(String id);
 
-    Note getNoteById(String id);
+    Page<NoteSummaryDTO> listNoteSummaries(Set<Tag> tags, Pageable pageable);
+
+    public Note getNoteDetailsById(String id);
 
     Map<String, Integer> getWordStats(String id);
-
-    Page<Note> listNotes(Set<Tag> tags, Pageable pageable);
 }

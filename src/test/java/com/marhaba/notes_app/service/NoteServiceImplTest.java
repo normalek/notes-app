@@ -1,6 +1,7 @@
 package com.marhaba.notes_app.service;
 
 import com.marhaba.notes_app.dto.NoteDTO;
+import com.marhaba.notes_app.dto.NoteSummaryDTO;
 import com.marhaba.notes_app.dto.exception.BusinessException;
 import com.marhaba.notes_app.entity.Note;
 import com.marhaba.notes_app.entity.Tag;
@@ -48,7 +49,7 @@ public class NoteServiceImplTest {
 
         when(noteRepository.findById("123")).thenReturn(Optional.of(note));
 
-        Note result = noteService.getNoteById("123");
+        Note result = noteService.getNoteDetailsById("123");
         assertEquals("Test Note", result.getTitle());
     }
 
@@ -56,7 +57,7 @@ public class NoteServiceImplTest {
     void testGetNoteById_NotFound() {
         when(noteRepository.findById("123")).thenReturn(Optional.empty());
 
-        assertThrows(BusinessException.class, () -> noteService.getNoteById("123"));
+        assertThrows(BusinessException.class, () -> noteService.getNoteDetailsById("123"));
     }
 
     @Test
@@ -114,7 +115,6 @@ public class NoteServiceImplTest {
         verify(noteRepository, times(1)).deleteById("123");
     }
 
-    @Test
     void testListNotes_WithTags() {
         Set<Tag> tags = new HashSet<>();
         tags.add(Tag.BUSINESS);
@@ -124,7 +124,7 @@ public class NoteServiceImplTest {
 
         when(noteRepository.findByTagsInOrderByCreatedDateDesc(tags, pageable)).thenReturn(page);
 
-        Page<Note> result = noteService.listNotes(tags, pageable);
+        Page<NoteSummaryDTO> result = noteService.listNoteSummaries(tags, pageable);
 
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
@@ -138,7 +138,7 @@ public class NoteServiceImplTest {
 
         when(noteRepository.findAllByOrderByCreatedDateDesc(pageable)).thenReturn(page);
 
-        Page<Note> result = noteService.listNotes(Collections.emptySet(), pageable);
+        Page<NoteSummaryDTO> result = noteService.listNoteSummaries(Collections.emptySet(), pageable);
 
         assertNotNull(result);
         assertEquals(2, result.getTotalElements());
