@@ -15,10 +15,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -72,12 +73,16 @@ public class NoteServiceImpl implements NoteService {
 
     public Map<String, Integer> getWordStats(String noteId) {
         Note note = getNoteDetailsById(noteId);
-        return Stream.of(note.getText().toLowerCase().split("\\W+"))
-                .map(String::toLowerCase)
+        return Arrays.stream(note.getText().toLowerCase().split("[^a-zA-Z]+"))
+                .collect(Collectors.groupingBy(word -> word, LinkedHashMap::new, Collectors.summingInt(word -> 1)))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
                 .collect(Collectors.toMap(
-                        word -> word,
-                        word -> 1,
-                        Integer::sum
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
                 ));
     }
 }
