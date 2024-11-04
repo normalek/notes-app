@@ -56,8 +56,10 @@ It also exposes `livenessstate` and `readinessstate` for orchestration managemen
 
 # Docker Compose support
 
-This project contains a Docker Compose file named `compose.yaml`.
+This project contains a Docker Compose file named `docker-compose.yaml`. It contains the following services:
+- **mongo** - MongoDB
+- **notes-app** - Spring Boot application
 
 # Tests
 
-Test coverage - **95%** of lines
+Test coverage - **98%** of lines
